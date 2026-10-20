@@ -2,9 +2,17 @@ import { ClientCards, ClientTable } from '@/components/clients/ClientList'
 import { SummaryMetrics } from '@/components/clients/SummaryMetrics'
 import { Button } from '@/components/ui/Button'
 import { SearchField } from '@/components/ui/SearchField'
+import { ArtistSelect } from '@/components/ui/ArtistSelect'
 import { StatusSelect } from '@/components/ui/StatusSelect'
 import { useStudio } from '@/context/StudioContext'
-import { matchesClient, matchesStatus, studioSummary, type StatusFilter } from '@/lib/metrics'
+import {
+  matchesArtist,
+  matchesClient,
+  matchesStatus,
+  studioSummary,
+  type ArtistFilter,
+  type StatusFilter,
+} from '@/lib/metrics'
 import { Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -14,10 +22,14 @@ export function ClientsPage() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<StatusFilter>('todos')
+  const [artist, setArtist] = useState<ArtistFilter>('todos')
   const summary = useMemo(() => studioSummary(clients), [clients])
   const visible = useMemo(
-    () => clients.filter((client) => matchesClient(client, query) && matchesStatus(client, status)),
-    [clients, query, status],
+    () =>
+      clients.filter(
+        (client) => matchesClient(client, query) && matchesStatus(client, status) && matchesArtist(client, artist),
+      ),
+    [clients, query, status, artist],
   )
 
   return (
@@ -42,6 +54,7 @@ export function ClientsPage() {
           <SearchField value={query} onChange={setQuery} />
         </div>
         <StatusSelect value={status} onChange={setStatus} />
+        <ArtistSelect value={artist} onChange={setArtist} />
       </div>
 
       {clientsError ? (

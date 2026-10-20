@@ -24,6 +24,7 @@ export type ClientDraft = {
   title: string
   description: string
   bodyLocation: string
+  artist: string
   imageUrl: string
   total: string
   times: string
@@ -65,6 +66,7 @@ export function clientToDraft(client: Client): ClientDraft {
     title: client.tattoo.title,
     description: client.tattoo.description,
     bodyLocation: client.tattoo.bodyLocation,
+    artist: client.tattoo.artist,
     imageUrl: client.tattoo.imageUrl,
     total: formatMoney(client.totalCents, 'precise'),
     times: String(times),
@@ -84,7 +86,7 @@ export function emptyDraft(): ClientDraft {
     instagram: '',
     birthDate: '',
     notes: '',
-    tattoo: { title: '', description: '', bodyLocation: '', imageUrl: '' },
+    tattoo: { title: '', description: '', bodyLocation: '', artist: '', imageUrl: '' },
     totalCents: 0,
     installmentCount: 1,
     startDate,
@@ -165,6 +167,7 @@ export function draftToClient(draft: ClientDraft, id: string): Client {
       title,
       description: scheduled.description.trim(),
       bodyLocation: scheduled.bodyLocation.trim(),
+      artist: scheduled.artist,
       imageUrl: scheduled.imageUrl,
     },
     totalCents: parseMoney(scheduled.total),

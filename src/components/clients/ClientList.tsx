@@ -3,7 +3,8 @@ import { formatShortDate, todayISO } from '@/lib/dates'
 import { clientBalance, clientStatus, nextOpenInstallment, paidCountOf } from '@/lib/metrics'
 import { formatMoney } from '@/lib/money'
 import type { Client } from '@/types/client'
-import { Pencil } from 'lucide-react'
+import { useDeleteClient } from '@/context/DeleteClientContext'
+import { Eye, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export function ClientTable({ clients }: { clients: Client[] }) {
@@ -20,6 +21,9 @@ export function ClientTable({ clients }: { clients: Client[] }) {
             <th scope="col" className="hidden w-[210px] px-3 font-semibold xl:table-cell">
               TATUAGEM
             </th>
+            <th scope="col" className="w-[110px] px-3 font-semibold">
+              TATUADOR
+            </th>
             <th scope="col" className="hidden w-[110px] px-3 font-semibold xl:table-cell">
               TOTAL
             </th>
@@ -35,7 +39,7 @@ export function ClientTable({ clients }: { clients: Client[] }) {
             <th scope="col" className="w-[120px] px-3 font-semibold">
               STATUS
             </th>
-            <th scope="col" className="w-[108px] px-3 font-semibold">
+            <th scope="col" className="w-[190px] px-3 font-semibold">
               AÇÕES
             </th>
           </tr>
@@ -50,6 +54,7 @@ export function ClientTable({ clients }: { clients: Client[] }) {
                   <div className="text-[12px] text-[var(--muted)]">{client.phone}</div>
                 </td>
                 <td className="hidden px-3 text-[14px] xl:table-cell">{client.tattoo.title}</td>
+                <td className="whitespace-nowrap px-3 text-[14px]">{client.tattoo.artist || '—'}</td>
                 <td className="hidden whitespace-nowrap px-3 text-[14px] xl:table-cell">
                   {formatMoney(client.totalCents)}
                 </td>
@@ -64,7 +69,7 @@ export function ClientTable({ clients }: { clients: Client[] }) {
                   <StatusBadge status={clientStatus(client, today)} />
                 </td>
                 <td className="px-3">
-                  <EditLink id={client.id} />
+                  <ClientActions client={client} />
                 </td>
               </tr>
             )
@@ -91,6 +96,12 @@ export function ClientCards({ clients }: { clients: Client[] }) {
             <p className="text-[12px] text-[var(--muted)]">{client.phone}</p>
             <p className="text-[14px]">
               {client.tattoo.title}
+              {client.tattoo.artist && (
+                <>
+                  <span className="text-[var(--muted)]"> · </span>
+                  {client.tattoo.artist}
+                </>
+              )}
               <span className="text-[var(--muted)]"> · </span>
               {paidCountOf(client.Installments)} de {client.Installments.length}
             </p>
@@ -98,7 +109,7 @@ export function ClientCards({ clients }: { clients: Client[] }) {
               <p>Saldo {formatMoney(clientBalance(client))}</p>
               <p className="text-[var(--muted)]">{next ? formatShortDate(next.dueDate) : '—'}</p>
             </div>
-            <EditLink id={client.id} />
+            <ClientActions client={client} />
           </article>
         )
       })}
@@ -106,14 +117,26 @@ export function ClientCards({ clients }: { clients: Client[] }) {
   )
 }
 
-function EditLink({ id }: { id: string }) {
+function ClientActions({ client }: { client: Client }) {
+  const requestDelete = useDeleteClient()
+
   return (
-    <Link
-      to={`/clientes/${id}`}
-      className="inline-flex h-9 items-center gap-1.5 text-[13px] font-semibold text-[var(--bone)]"
-    >
-      <Pencil className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
-      Editar
-    </Link>
+    <div className="flex items-center gap-4">
+      <Link
+        to={`/clientes/${client.id}`}
+        className="inline-flex h-9 items-center gap-1.5 text-[13px] font-semibold text-[var(--bone)]"
+      >
+        <Eye className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
+        Detalhes
+      </Link>
+      <button
+        type="button"
+        onClick={() => requestDelete(client)}
+        className="inline-flex h-9 items-center gap-1.5 text-[13px] font-semibold text-[var(--overdue)]"
+      >
+        <Trash2 className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
+        Excluir
+      </button>
+    </div>
   )
 }

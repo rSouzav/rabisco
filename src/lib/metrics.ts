@@ -116,10 +116,24 @@ export function matchesStatus(client: Client, filter: StatusFilter, today = toda
   return filter === 'todos' || clientStatus(client, today) === filter
 }
 
+export type ArtistFilter = 'todos' | string
+
+export function matchesArtist(client: Client, filter: ArtistFilter) {
+  return filter === 'todos' || client.tattoo.artist === filter
+}
+
 export function matchesClient(client: Client, query: string) {
   const normalized = query.trim().toLowerCase()
   if (!normalized) return true
-  return [client.name, client.phone, client.email, client.tattoo.title, client.tattoo.description, client.tattoo.bodyLocation]
+  return [
+    client.name,
+    client.phone,
+    client.email,
+    client.tattoo.title,
+    client.tattoo.description,
+    client.tattoo.bodyLocation,
+    client.tattoo.artist,
+  ]
     .join(' ')
     .toLowerCase()
     .includes(normalized)

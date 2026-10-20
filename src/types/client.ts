@@ -7,10 +7,13 @@ export type Installment = {
   paidOn: string | null
 }
 
+export const TATTOO_ARTISTS = ['Gustavo', 'Mikari', 'Warol'] as const
+
 export type Tattoo = {
   title: string
   description: string
   bodyLocation: string
+  artist: string
   imageUrl: string
 }
 

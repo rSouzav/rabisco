@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/Button'
+import { SelectField } from '@/components/ui/SelectField'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { TextField } from '@/components/ui/TextField'
 import { InstallmentEditor } from '@/components/ficha/InstallmentEditor'
@@ -6,8 +7,8 @@ import { useClientDraft } from '@/components/ficha/useClientDraft'
 import { createId, draftToClient } from '@/lib/draft'
 import { formatMoney } from '@/lib/money'
 import { formatShortDate } from '@/lib/dates'
-import type { Client } from '@/types/client'
-import { ChevronLeft } from 'lucide-react'
+import { TATTOO_ARTISTS, type Client } from '@/types/client'
+import { ChevronLeft, Trash2 } from 'lucide-react'
 import { useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -15,7 +16,7 @@ type ClientFileFormProps = {
   client: Client | null
   onSave: (client: Client) => Promise<string | null>
   onCancel: () => void
-  onDelete: () => Promise<string | null>
+  onDelete: () => void
 }
 
 const PERSONAL_FIELDS = [
@@ -29,33 +30,17 @@ const PERSONAL_FIELDS = [
 export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFileFormProps) {
   const fileRef = useRef<HTMLInputElement>(null)
   const draftState = useClientDraft(client)
-  const { draft, view, error, saved, today } = draftState
+  const { draft, view, saved, today } = draftState
   const meta = [draft.phone.trim(), draft.title.trim() || draft.bodyLocation.trim()].filter(Boolean)
   const [busy, setBusy] = useState(false)
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     if (busy) return
-    if (!draft.name.trim()) {
-      draftState.setError('Informe o nome do cliente.')
-      return
-    }
     setBusy(true)
     const message = await onSave(draftToClient(draft, client?.id || createId()))
     setBusy(false)
-    if (message) {
-      draftState.setError(message)
-      return
-    }
-    draftState.markSaved()
-  }
-
-  async function handleDelete() {
-    if (busy) return
-    setBusy(true)
-    const message = await onDelete()
-    setBusy(false)
-    if (message) draftState.setError(message)
+    if (!message) draftState.markSaved()
   }
 
   const saveLabel = busy ? 'Salvando…' : saved ? 'Salvo' : 'Salvar cliente'
@@ -94,11 +79,10 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
               )}
             </p>
           )}
-          {error && <p className="text-[13px] text-[var(--overdue)]">{error}</p>}
         </div>
         <div className="hidden shrink-0 items-center gap-2.5 md:flex">
           <Button variant="outline" className="h-11 px-4" onClick={onCancel}>
-            Cancelar
+            Voltar
           </Button>
           <Button type="submit" disabled={busy} className="h-11 px-[18px]">
             {saveLabel}
@@ -143,7 +127,7 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
               <img
                 src={draft.imageUrl}
                 alt="Referência da tatuagem"
-                className="h-[280px] w-full object-cover xl:h-[380px]"
+                className="h-[280px] w-full object-contain xl:h-[380px]"
               />
             ) : (
               <span className="flex h-[280px] w-full items-center justify-center bg-[var(--surface)] px-6 text-center text-[13px] text-[var(--muted)] xl:h-[380px]">
@@ -173,6 +157,13 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
             value={draft.bodyLocation}
             heightClass="h-[46px]"
             onChange={(value) => draftState.update('bodyLocation', value)}
+          />
+          <SelectField
+            label="TATUADOR"
+            value={draft.artist}
+            options={TATTOO_ARTISTS}
+            heightClass="h-[46px]"
+            onChange={(value) => draftState.update('artist', value)}
           />
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <TextField
@@ -242,9 +233,10 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
       </section>
 
       <footer className="hidden items-center justify-between gap-4 md:flex">
-        <button type="button" onClick={handleDelete} disabled={busy} className="text-[13px] text-[var(--overdue)]">
+        <Button variant="danger" onClick={onDelete} disabled={busy} className="h-11 px-4">
+          <Trash2 className="size-4" strokeWidth={1.75} aria-hidden="true" />
           Excluir cliente
-        </button>
+        </Button>
         {view.nextOnTime && (
           <p className="text-[13px] text-[var(--muted)]">
             Próxima cobrança em dia: {formatShortDate(view.nextOnTime.dueDate)} ·{' '}
@@ -253,13 +245,14 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
         )}
       </footer>
 
-      <div className="flex flex-col items-start gap-4 md:hidden">
+      <div className="flex flex-col gap-2.5 md:hidden">
         <Button type="submit" disabled={busy} className="h-12 w-full">
           {saveLabel}
         </Button>
-        <button type="button" onClick={handleDelete} disabled={busy} className="text-[13px] text-[var(--overdue)]">
+        <Button variant="danger" onClick={onDelete} disabled={busy} className="h-12 w-full">
+          <Trash2 className="size-4" strokeWidth={1.75} aria-hidden="true" />
           Excluir cliente
-        </button>
+        </Button>
       </div>
     </form>
   )

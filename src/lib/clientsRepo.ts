@@ -12,6 +12,7 @@ type ClientRow = {
   tattoo_title: string | null
   tattoo_description: string | null
   tattoo_body_location: string | null
+  tattoo_artist: string | null
   tattoo_image_url: string | null
   total_cents: number | null
   installment_count: number | null
@@ -52,6 +53,7 @@ function rowToClient(row: ClientRow, Installments: Installment[]): Client {
       title: row.tattoo_title ?? '',
       description: row.tattoo_description ?? '',
       bodyLocation: row.tattoo_body_location ?? '',
+      artist: row.tattoo_artist ?? '',
       imageUrl: row.tattoo_image_url ?? '',
     },
     totalCents: row.total_cents ?? 0,
@@ -73,6 +75,7 @@ function clientToRow(client: Client): ClientRow {
     tattoo_title: client.tattoo.title,
     tattoo_description: client.tattoo.description,
     tattoo_body_location: client.tattoo.bodyLocation,
+    tattoo_artist: client.tattoo.artist || null,
     tattoo_image_url: client.tattoo.imageUrl,
     total_cents: client.totalCents,
     installment_count: client.installmentCount,
