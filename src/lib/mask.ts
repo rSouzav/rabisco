@@ -1,4 +1,14 @@
-export type MaskKind = 'phone' | 'date'
+import { formatMoney } from '@/lib/money'
+
+export type MaskKind = 'phone' | 'date' | 'money'
+
+const MONEY_MAX_DIGITS = 11
+
+export function maskInputMode(kind: MaskKind | undefined) {
+  if (kind === 'phone') return 'tel'
+  if (kind === 'date' || kind === 'money') return 'numeric'
+  return undefined
+}
 
 export function phoneDigits(value: string) {
   let digits = value.replace(/\D/g, '')
@@ -27,6 +37,22 @@ export function maskDate(value: string) {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
 }
 
+export function maskMoney(value: string) {
+  const raw = value.replace(/\D/g, '')
+  if (!raw) return ''
+  const digits = raw.replace(/^0+/, '').slice(0, MONEY_MAX_DIGITS)
+  return formatMoney(Number(digits || '0'), 'precise')
+}
+
+function caretBeforeTrailingDigits(masked: string, digitCount: number) {
+  let seen = 0
+  for (let index = masked.length; index > 0; index -= 1) {
+    if (seen === digitCount) return index
+    if (/\d/.test(masked[index - 1] ?? '')) seen += 1
+  }
+  return seen === digitCount ? 0 : masked.length
+}
+
 function caretAfterDigits(masked: string, digitCount: number) {
   if (digitCount <= 0) return 0
   let seen = 0
@@ -40,9 +66,11 @@ function caretAfterDigits(masked: string, digitCount: number) {
 export function commitMask(input: HTMLInputElement, kind: MaskKind) {
   const selectionStart = input.selectionStart ?? input.value.length
   const digitsBefore = input.value.slice(0, selectionStart).replace(/\D/g, '').length
-  const value = kind === 'phone' ? maskPhone(input.value) : maskDate(input.value)
+  const digitsAfter = input.value.slice(selectionStart).replace(/\D/g, '').length
+  const value = kind === 'phone' ? maskPhone(input.value) : kind === 'date' ? maskDate(input.value) : maskMoney(input.value)
   input.value = value
-  const caret = caretAfterDigits(value, digitsBefore)
+  const caret =
+    kind === 'money' ? caretBeforeTrailingDigits(value, digitsAfter) : caretAfterDigits(value, digitsBefore)
   const place = () => {
     if (document.activeElement === input) input.setSelectionRange(caret, caret)
   }

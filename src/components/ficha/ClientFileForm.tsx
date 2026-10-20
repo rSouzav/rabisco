@@ -169,7 +169,7 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
             <TextField
               label="VALOR TOTAL"
               value={draft.total}
-              inputMode="decimal"
+              mask="money"
               heightClass="h-[46px]"
               onChange={(value) => draftState.update('total', value)}
               onBlur={() => draftState.blurSchedule('total')}
@@ -185,7 +185,7 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
             <TextField
               label="MENSALIDADE"
               value={draft.monthly}
-              inputMode="decimal"
+              mask="money"
               heightClass="h-[46px]"
               onChange={(value) => draftState.update('monthly', value)}
               onBlur={() => draftState.blurSchedule('monthly')}

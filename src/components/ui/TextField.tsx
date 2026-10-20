@@ -1,5 +1,5 @@
 import { cn } from '@/lib/cn'
-import { commitMask, type MaskKind } from '@/lib/mask'
+import { commitMask, maskInputMode, type MaskKind } from '@/lib/mask'
 import { useId, type ReactNode } from 'react'
 
 type TextFieldProps = {
@@ -69,7 +69,7 @@ export function TextField({
               value={value}
               autoComplete={autoComplete}
               placeholder={placeholder}
-              inputMode={inputMode ?? (mask === 'phone' ? 'tel' : mask === 'date' ? 'numeric' : undefined)}
+              inputMode={inputMode ?? maskInputMode(mask)}
               onChange={(event) => onChange(mask ? commitMask(event.currentTarget, mask) : event.target.value)}
               onBlur={onBlur}
               className={cn(

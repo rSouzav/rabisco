@@ -2,7 +2,7 @@ import { PayBox, payState } from '@/components/ficha/PayBox'
 import { formatShortDate } from '@/lib/dates'
 import type { DraftInstallment } from '@/lib/draft'
 import { cn } from '@/lib/cn'
-import { commitMask, type MaskKind } from '@/lib/mask'
+import { commitMask, maskInputMode, type MaskKind } from '@/lib/mask'
 import { formatMoney, parseMoney } from '@/lib/money'
 import { overdueReminder, whatsappLink } from '@/lib/whatsapp'
 import { MessageCircle } from 'lucide-react'
@@ -96,6 +96,7 @@ function InstallmentTable({
                     value={item.paidText}
                     label={`Valor pago da parcela ${number}`}
                     muted={paidCents === 0}
+                    mask="money"
                     onChange={(value) => onPaidChange(item.number, value)}
                     onBlur={() => onPaidBlur(item.number)}
                   />
@@ -161,6 +162,7 @@ function InstallmentCards({
               label="Valor pago"
               value={item.paidText}
               muted={paidCents === 0}
+              mask="money"
               onChange={(value) => onPaidChange(item.number, value)}
               onBlur={() => onPaidBlur(item.number)}
             />
@@ -239,7 +241,7 @@ function CellInput({
       value={value}
       aria-label={label}
       placeholder={placeholder}
-      inputMode={mask === 'date' ? 'numeric' : mask === 'phone' ? 'tel' : undefined}
+      inputMode={maskInputMode(mask)}
       onChange={(event) => onChange(mask ? commitMask(event.currentTarget, mask) : event.target.value)}
       onBlur={onBlur}
       className={cn(
@@ -274,7 +276,7 @@ function InlineField({
         value={value}
         placeholder={placeholder}
         aria-label={label}
-        inputMode={mask === 'date' ? 'numeric' : mask === 'phone' ? 'tel' : undefined}
+        inputMode={maskInputMode(mask)}
         onChange={(event) => onChange(mask ? commitMask(event.currentTarget, mask) : event.target.value)}
         onBlur={onBlur}
         className={cn(
