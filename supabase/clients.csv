@@ -1,0 +1,6 @@
+id,name,phone,email,instagram,birth_date,notes,tattoo_title,tattoo_description,tattoo_body_location,tattoo_image_url,total_cents,installment_count,start_date
+marina,Marina Costa,(11) 98821-4402,marina.costa@email.com,@marinacosta,1994-03-12,Prefere sessões à tarde. Pele sensível no antebraço interno.,Dragão no antebraço,"Dragão blackwork no antebraço direito, do pulso ao cotovelo. Linha grossa, sem cor.",Antebraço direito,/marina.jpg,180000,6,2026-06-15
+lucas,Lucas Ferreira,(11) 99710-2281,lucas.ferreira@email.com,@lucasferreira,1991-11-02,,Lettering nas costas,"Lettering nas costas, em preto, acompanhando a coluna.",Costas,,240000,8,2026-05-02
+pedro,Pedro Henrique,(11) 98102-7744,pedro.henrique@email.com,@pedrohenrique,1998-01-27,,Sleeve japonês,"Sleeve japonês no braço, tradicional, ainda na primeira sessão.",Braço,,420000,12,2026-09-20
+camila,Camila Duarte,(11) 99655-0133,camila.duarte@email.com,@camiladuarte,2000-05-19,,Fine line no pulso,"Fine line no pulso, traço fino e único.",Pulso,,45000,1,2026-08-03
+ana,Ana Beatriz Nunes,(11) 99440-8820,ana.nunes@email.com,@anabeatriz,1996-09-08,,Floral na clavícula,"Floral na clavícula, três sessões já concluídas.",Clavícula,,90000,3,2026-04-10

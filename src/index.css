@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0b0b;
+  --surface: #141414;
+  --line: #2c2c2c;
+  --bone: #f3eee4;
+  --muted: #8c867c;
+  --ink: #0b0b0b;
+  --overdue: #e07a5f;
+  --partial: #c4a574;
+  --ok: #a8b5a0;
+  --status-overdue: #f07467;
+  --status-ok: #7fb2e5;
+  --status-paid: #7cc48b;
+  --sidebar: #101010;
+  --brand: #070707;
+  --nav: #1c1c1c;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: "Manrope", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .font-display {
+    font-family: "Cinzel", serif;
+  }
+
+  ::selection {
+    background: var(--bone);
+    color: var(--ink);
+  }
+}
