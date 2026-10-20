@@ -25,7 +25,7 @@ export function Modal({ open, title, icon, children, actions, onClose }: ModalPr
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 px-4 py-4 md:items-center"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 px-4 py-4"
       onClick={onClose}
     >
       <div
