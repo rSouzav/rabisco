@@ -1,4 +1,13 @@
-import { applySchedule, clientToDraft, emptyDraft, viewDraft, type ClientDraft, type DraftInstallment } from '@/lib/draft'
+import {
+  applySchedule,
+  clientToDraft,
+  distributePayment,
+  emptyDraft,
+  viewDraft,
+  withdrawPayment,
+  type ClientDraft,
+  type PaymentMove,
+} from '@/lib/draft'
 import { formatSlashDate, todayISO } from '@/lib/dates'
 import { maskPhoneFinal } from '@/lib/mask'
 import { formatMoney, parseMoney } from '@/lib/money'
@@ -24,12 +33,16 @@ export function useClientDraft(client: Client | null) {
     setDraft((current) => ({ ...current, [key]: value }))
   }
 
-  function updateInstallment(number: number, patch: Partial<Pick<DraftInstallment, 'paidText' | 'paidOnText'>>) {
-    markDirty()
-    setDraft((current) => ({
-      ...current,
-      Installments: current.Installments.map((item) => (item.number === number ? { ...item, ...patch } : item)),
-    }))
+  function movePayment(kind: 'pay' | 'withdraw', cents: number): PaymentMove {
+    const move =
+      kind === 'pay'
+        ? distributePayment(draft.Installments, cents, today)
+        : withdrawPayment(draft.Installments, cents)
+    if (move.ok) {
+      markDirty()
+      setDraft((current) => ({ ...current, Installments: move.Installments }))
+    }
+    return move
   }
 
   function blurPhone() {
@@ -38,17 +51,6 @@ export function useClientDraft(client: Client | null) {
 
   function blurSchedule(source: 'total' | 'times' | 'monthly' | 'start') {
     setDraft((current) => applySchedule(current, source))
-  }
-
-  function blurPaid(number: number) {
-    setDraft((current) => ({
-      ...current,
-      Installments: current.Installments.map((item) => {
-        if (item.number !== number) return item
-        const paidCents = Math.min(parseMoney(item.paidText), item.expectedCents)
-        return { ...item, paidText: formatMoney(paidCents, 'precise') }
-      }),
-    }))
   }
 
   function togglePaid(number: number) {
@@ -82,9 +84,8 @@ export function useClientDraft(client: Client | null) {
     today,
     update,
     blurPhone,
-    updateInstallment,
+    movePayment,
     blurSchedule,
-    blurPaid,
     togglePaid,
     setImage,
     setError,

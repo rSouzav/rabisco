@@ -2,7 +2,6 @@ import { PayBox, payState } from '@/components/ficha/PayBox'
 import { formatShortDate } from '@/lib/dates'
 import type { DraftInstallment } from '@/lib/draft'
 import { cn } from '@/lib/cn'
-import { commitMask, maskInputMode, type MaskKind } from '@/lib/mask'
 import { formatMoney, parseMoney } from '@/lib/money'
 import { overdueReminder, whatsappLink } from '@/lib/whatsapp'
 import { MessageCircle } from 'lucide-react'
@@ -13,9 +12,6 @@ type InstallmentEditorProps = {
   clientName: string
   phone: string
   onToggle: (number: number) => void
-  onPaidChange: (number: number, value: string) => void
-  onPaidBlur: (number: number) => void
-  onDateChange: (number: number, value: string) => void
 }
 
 export function InstallmentEditor(props: InstallmentEditorProps) {
@@ -27,16 +23,7 @@ export function InstallmentEditor(props: InstallmentEditorProps) {
   )
 }
 
-function InstallmentTable({
-  items,
-  today,
-  clientName,
-  phone,
-  onToggle,
-  onPaidChange,
-  onPaidBlur,
-  onDateChange,
-}: InstallmentEditorProps) {
+function InstallmentTable({ items, today, clientName, phone, onToggle }: InstallmentEditorProps) {
   return (
     <div className="hidden overflow-x-auto md:block">
       <table className="w-full min-w-[980px] border-collapse text-left">
@@ -91,24 +78,11 @@ function InstallmentTable({
                   {formatShortDate(item.dueDate)}
                 </td>
                 <td className="px-2.5 text-[14px]">{formatMoney(item.expectedCents, 'precise')}</td>
-                <td className="px-2.5">
-                  <CellInput
-                    value={item.paidText}
-                    label={`Valor pago da parcela ${number}`}
-                    muted={paidCents === 0}
-                    mask="money"
-                    onChange={(value) => onPaidChange(item.number, value)}
-                    onBlur={() => onPaidBlur(item.number)}
-                  />
+                <td className={cn('px-2.5 text-[14px]', paidCents === 0 && 'text-[var(--muted)]')}>
+                  {formatMoney(paidCents, 'precise')}
                 </td>
-                <td className="px-2.5">
-                  <CellInput
-                    value={item.paidOnText}
-                    label={`Data de pagamento da parcela ${number}`}
-                    placeholder="dd/mm/aaaa"
-                    mask="date"
-                    onChange={(value) => onDateChange(item.number, value)}
-                  />
+                <td className={cn('px-2.5 text-[14px]', !item.paidOnText && 'text-[var(--muted)]')}>
+                  {item.paidOnText || '—'}
                 </td>
                 <td className={cn('px-2.5 text-[13px]', situation.className)}>{situation.label}</td>
                 <td className="px-2.5">
@@ -123,16 +97,7 @@ function InstallmentTable({
   )
 }
 
-function InstallmentCards({
-  items,
-  today,
-  clientName,
-  phone,
-  onToggle,
-  onPaidChange,
-  onPaidBlur,
-  onDateChange,
-}: InstallmentEditorProps) {
+function InstallmentCards({ items, today, clientName, phone, onToggle }: InstallmentEditorProps) {
   return (
     <div className="md:hidden">
       {items.map((item) => {
@@ -158,21 +123,8 @@ function InstallmentCards({
               <span className={cn('text-[13px]', situation.className)}>{situation.label}</span>
             </div>
             <p className="text-[13px] text-[var(--muted)]">Previsto {formatMoney(item.expectedCents, 'precise')}</p>
-            <InlineField
-              label="Valor pago"
-              value={item.paidText}
-              muted={paidCents === 0}
-              mask="money"
-              onChange={(value) => onPaidChange(item.number, value)}
-              onBlur={() => onPaidBlur(item.number)}
-            />
-            <InlineField
-              label="Pago em"
-              value={item.paidOnText}
-              placeholder="dd/mm/aaaa"
-              mask="date"
-              onChange={(value) => onDateChange(item.number, value)}
-            />
+            <InfoLine label="Valor pago" value={formatMoney(paidCents, 'precise')} muted={paidCents === 0} />
+            <InfoLine label="Pago em" value={item.paidOnText || '—'} muted={!item.paidOnText} />
             {reminderHref && (
               <WhatsAppReminder href={reminderHref} number={number} className="h-11 w-full text-[14px]" />
             )}
@@ -219,72 +171,12 @@ function WhatsAppReminder({ href, number, className }: { href: string; number: s
   )
 }
 
-function CellInput({
-  value,
-  label,
-  placeholder,
-  muted = false,
-  mask,
-  onChange,
-  onBlur,
-}: {
-  value: string
-  label: string
-  placeholder?: string
-  muted?: boolean
-  mask?: MaskKind
-  onChange: (value: string) => void
-  onBlur?: () => void
-}) {
+function InfoLine({ label, value, muted }: { label: string; value: string; muted: boolean }) {
   return (
-    <input
-      value={value}
-      aria-label={label}
-      placeholder={placeholder}
-      inputMode={maskInputMode(mask)}
-      onChange={(event) => onChange(mask ? commitMask(event.currentTarget, mask) : event.target.value)}
-      onBlur={onBlur}
-      className={cn(
-        'h-9 w-full border border-[var(--line)] bg-[var(--surface)] px-2.5 text-[13px] outline-none placeholder:text-[var(--muted)] focus:border-[var(--bone)]',
-        muted ? 'text-[var(--muted)]' : 'text-[var(--bone)]',
-      )}
-    />
-  )
-}
-
-function InlineField({
-  label,
-  value,
-  placeholder,
-  muted = false,
-  mask,
-  onChange,
-  onBlur,
-}: {
-  label: string
-  value: string
-  placeholder?: string
-  muted?: boolean
-  mask?: MaskKind
-  onChange: (value: string) => void
-  onBlur?: () => void
-}) {
-  return (
-    <label className="flex h-11 items-center justify-between gap-3 border border-[var(--line)] bg-[var(--surface)] px-3">
-      <span className="text-[13px] text-[var(--muted)]">{label}</span>
-      <input
-        value={value}
-        placeholder={placeholder}
-        aria-label={label}
-        inputMode={maskInputMode(mask)}
-        onChange={(event) => onChange(mask ? commitMask(event.currentTarget, mask) : event.target.value)}
-        onBlur={onBlur}
-        className={cn(
-          'w-[46%] bg-transparent text-right text-[16px] outline-none placeholder:text-[var(--muted)]',
-          muted ? 'text-[var(--muted)]' : 'text-[var(--bone)]',
-        )}
-      />
-    </label>
+    <div className="flex items-center justify-between gap-3 text-[14px]">
+      <span className="text-[var(--muted)]">{label}</span>
+      <span className={muted ? 'text-[var(--muted)]' : 'text-[var(--bone)]'}>{value}</span>
+    </div>
   )
 }
 

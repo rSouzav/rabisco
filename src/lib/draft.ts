@@ -149,6 +149,58 @@ export function applySchedule(draft: ClientDraft, source: 'total' | 'times' | 'm
   }
 }
 
+export type PaymentMove = { ok: true; Installments: DraftInstallment[]; numbers: number[] } | { ok: false; error: string }
+
+function paidOf(item: DraftInstallment) {
+  return Math.min(Math.max(parseMoney(item.paidText), 0), item.expectedCents)
+}
+
+export function distributePayment(items: DraftInstallment[], cents: number, paidOn: string): PaymentMove {
+  const openCents = items.reduce((sum, item) => sum + item.expectedCents - paidOf(item), 0)
+  if (cents <= 0) return { ok: false, error: 'Digite o valor recebido.' }
+  if (openCents === 0) return { ok: false, error: 'Todas as parcelas já estão pagas.' }
+  if (cents > openCents) {
+    return { ok: false, error: `O valor passa do que falta pagar (${formatMoney(openCents, 'precise')}).` }
+  }
+
+  let left = cents
+  const numbers: number[] = []
+  const Installments = items.map((item) => {
+    const paid = paidOf(item)
+    const take = Math.min(left, item.expectedCents - paid)
+    if (take <= 0) return item
+    left -= take
+    numbers.push(item.number)
+    return { ...item, paidText: formatMoney(paid + take, 'precise'), paidOnText: formatSlashDate(paidOn) }
+  })
+  return { ok: true, Installments, numbers }
+}
+
+export function withdrawPayment(items: DraftInstallment[], cents: number): PaymentMove {
+  const receivedCents = items.reduce((sum, item) => sum + paidOf(item), 0)
+  if (cents <= 0) return { ok: false, error: 'Digite o valor a retirar.' }
+  if (receivedCents === 0) return { ok: false, error: 'Nenhuma parcela tem valor pago para retirar.' }
+  if (cents > receivedCents) {
+    return { ok: false, error: `Só dá para retirar até ${formatMoney(receivedCents, 'precise')}, que é o já recebido.` }
+  }
+
+  let left = cents
+  const numbers: number[] = []
+  const Installments = [...items]
+    .reverse()
+    .map((item) => {
+      const paid = paidOf(item)
+      const take = Math.min(left, paid)
+      if (take <= 0) return item
+      left -= take
+      numbers.unshift(item.number)
+      const rest = paid - take
+      return { ...item, paidText: formatMoney(rest, 'precise'), paidOnText: rest > 0 ? item.paidOnText : '' }
+    })
+    .reverse()
+  return { ok: true, Installments, numbers }
+}
+
 export function draftToClient(draft: ClientDraft, id: string): Client {
   const scheduled = applySchedule(draft, 'total')
   const startDate = parseSlashDate(scheduled.startDate) ?? todayISO()

@@ -3,6 +3,7 @@ import { SelectField } from '@/components/ui/SelectField'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { TextField } from '@/components/ui/TextField'
 import { InstallmentEditor } from '@/components/ficha/InstallmentEditor'
+import { PaymentPanel } from '@/components/ficha/PaymentPanel'
 import { useClientDraft } from '@/components/ficha/useClientDraft'
 import { createId, draftToClient } from '@/lib/draft'
 import { formatMoney } from '@/lib/money'
@@ -210,12 +211,13 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
       <section className="flex flex-col gap-4">
         <h2 className="font-display text-[20px]">Parcelas</h2>
         <p className="text-[12px] leading-[1.4] text-[var(--muted)] xl:hidden">
-          Marque o que já foi pago e anote o valor e o dia.
+          Digite o que a cliente pagou e confirme. O valor cobre as parcelas em aberto, da mais antiga para a mais nova.
         </p>
         <p className="hidden text-[12px] leading-[1.4] text-[var(--muted)] xl:block">
-          Marque o que já foi pago. Se entrou um valor diferente, registre em valor pago e o dia. O que falta continua
-          na próxima cobrança.
+          Digite o que a cliente pagou e confirme. O valor cobre as parcelas em aberto, da mais antiga para a mais nova,
+          com a data de hoje. Se digitou errado, use Retirar: o valor sai das últimas parcelas pagas.
         </p>
+        <PaymentPanel onMove={draftState.movePayment} />
         <div className="grid grid-cols-2 gap-x-6 gap-y-3 border-y border-[var(--line)] py-3 md:grid-cols-4 md:py-[18px]">
           <Total label="AINDA DEVE" value={formatMoney(view.balanceCents, 'precise')} />
           <Total label="EM ATRASO" value={formatMoney(view.overdueCents, 'precise')} tone="overdue" />
@@ -228,9 +230,6 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
           clientName={draft.name}
           phone={draft.phone}
           onToggle={draftState.togglePaid}
-          onPaidChange={(number, value) => draftState.updateInstallment(number, { paidText: value })}
-          onPaidBlur={draftState.blurPaid}
-          onDateChange={(number, value) => draftState.updateInstallment(number, { paidOnText: value })}
         />
       </section>
 
