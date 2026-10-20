@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { useDeleteClient } from '@/context/DeleteClientContext'
 import { useStudio } from '@/context/StudioContext'
+import { phoneError } from '@/lib/mask'
 import type { Client } from '@/types/client'
 import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
@@ -27,6 +28,11 @@ export function ClientFilePage() {
     if (!next.name) {
       setSaveState({ step: 'error', client: null, message: 'Informe o nome do cliente antes de salvar.' })
       return 'Informe o nome do cliente.'
+    }
+    const phoneMessage = phoneError(next.phone)
+    if (phoneMessage) {
+      setSaveState({ step: 'error', client: null, message: phoneMessage })
+      return phoneMessage
     }
     setSaveState({ step: 'loading', client: next })
     const message = await saveClient(next)

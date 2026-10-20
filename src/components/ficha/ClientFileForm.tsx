@@ -8,6 +8,7 @@ import { useClientDraft } from '@/components/ficha/useClientDraft'
 import { createId, draftToClient } from '@/lib/draft'
 import { formatMoney } from '@/lib/money'
 import { formatShortDate } from '@/lib/dates'
+import { phoneError } from '@/lib/mask'
 import { TATTOO_ARTISTS, type Client } from '@/types/client'
 import { ChevronLeft, Trash2 } from 'lucide-react'
 import { useRef, useState, type FormEvent } from 'react'
@@ -34,10 +35,13 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
   const { draft, view, saved, today } = draftState
   const meta = [draft.phone.trim(), draft.title.trim() || draft.bodyLocation.trim()].filter(Boolean)
   const [busy, setBusy] = useState(false)
+  const [phoneTouched, setPhoneTouched] = useState(false)
+  const phoneMessage = phoneTouched ? phoneError(draft.phone) : null
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     if (busy) return
+    setPhoneTouched(true)
     setBusy(true)
     const message = await onSave(draftToClient(draft, client?.id || createId()))
     setBusy(false)
@@ -106,7 +110,16 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
               mask={'mask' in field ? field.mask : undefined}
               heightClass="h-[46px]"
               onChange={(value) => draftState.update(field.key, value)}
-              onBlur={field.key === 'phone' ? draftState.blurPhone : undefined}
+              required={field.key === 'name' || field.key === 'phone'}
+              error={field.key === 'phone' ? phoneMessage : undefined}
+              onBlur={
+                field.key === 'phone'
+                  ? () => {
+                      draftState.blurPhone()
+                      setPhoneTouched(true)
+                    }
+                  : undefined
+              }
             />
           ))}
           <TextField

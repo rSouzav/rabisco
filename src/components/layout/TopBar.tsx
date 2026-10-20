@@ -24,7 +24,11 @@ function ClientsBar() {
           Clientes
         </Link>
       </div>
-      <button type="button" onClick={logout} className="inline-flex items-center gap-2 text-[13px] text-[var(--muted)]">
+      <button
+        type="button"
+        onClick={logout}
+        className="inline-flex cursor-pointer items-center gap-2 text-[13px] text-[var(--muted)] transition-colors hover:text-[var(--bone)]"
+      >
         <LogOut className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
         Sair
       </button>
