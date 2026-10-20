@@ -20,10 +20,10 @@ type ClientFileFormProps = {
 
 const PERSONAL_FIELDS = [
   { key: 'name', label: 'NOME', autoComplete: 'name' },
-  { key: 'phone', label: 'TELEFONE', autoComplete: 'tel', inputMode: 'tel' },
+  { key: 'phone', label: 'TELEFONE', autoComplete: 'tel', mask: 'phone', placeholder: '(11) 98821-4402' },
   { key: 'email', label: 'E-MAIL', autoComplete: 'email', type: 'email', inputMode: 'email' },
   { key: 'instagram', label: 'INSTAGRAM', autoComplete: 'off' },
-  { key: 'birthDate', label: 'NASCIMENTO', placeholder: 'dd/mm/aaaa' },
+  { key: 'birthDate', label: 'NASCIMENTO', placeholder: 'dd/mm/aaaa', mask: 'date' },
 ] as const
 
 export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFileFormProps) {
@@ -118,8 +118,10 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
               placeholder={'placeholder' in field ? field.placeholder : undefined}
               type={'type' in field ? field.type : 'text'}
               inputMode={'inputMode' in field ? field.inputMode : undefined}
+              mask={'mask' in field ? field.mask : undefined}
               heightClass="h-[46px]"
               onChange={(value) => draftState.update(field.key, value)}
+              onBlur={field.key === 'phone' ? draftState.blurPhone : undefined}
             />
           ))}
           <TextField
@@ -201,6 +203,7 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
               label="INÍCIO"
               value={draft.startDate}
               placeholder="dd/mm/aaaa"
+              mask="date"
               heightClass="h-[46px]"
               onChange={(value) => draftState.update('startDate', value)}
               onBlur={() => draftState.blurSchedule('start')}

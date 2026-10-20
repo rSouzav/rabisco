@@ -3,13 +3,13 @@ import { StudioProvider, useStudio } from '@/context/StudioContext'
 import { ClientFilePage } from '@/pages/ClientFilePage'
 import { ClientsPage } from '@/pages/ClientsPage'
 import { LoginPage } from '@/pages/LoginPage'
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { HashRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 
 
 export function App() {
   return (
     <StudioProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route element={<RequireAuth />}>
@@ -20,7 +20,7 @@ export function App() {
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </StudioProvider>
   )
 }

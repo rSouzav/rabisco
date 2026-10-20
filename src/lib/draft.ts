@@ -1,4 +1,5 @@
 import { formatSlashDate, parseSlashDate, todayISO } from '@/lib/dates'
+import { maskPhoneFinal } from '@/lib/mask'
 import { balanceOf, nextOnTimeInstallment, overdueOf, receivedOf, statusOf } from '@/lib/metrics'
 import { formatMoney, parseMoney } from '@/lib/money'
 import { buildInstallments, clampTimes } from '@/lib/schedule'
@@ -56,7 +57,7 @@ export function clientToDraft(client: Client): ClientDraft {
   const times = client.Installments.length || client.installmentCount || 1
   return {
     name: client.name,
-    phone: client.phone,
+    phone: maskPhoneFinal(client.phone),
     email: client.email,
     instagram: client.instagram,
     birthDate: client.birthDate ? formatSlashDate(client.birthDate) : '',
@@ -155,7 +156,7 @@ export function draftToClient(draft: ClientDraft, id: string): Client {
   return {
     id,
     name: scheduled.name.trim(),
-    phone: scheduled.phone.trim(),
+    phone: maskPhoneFinal(scheduled.phone),
     email: scheduled.email.trim(),
     instagram: scheduled.instagram.trim(),
     birthDate: parseSlashDate(scheduled.birthDate) ?? '',

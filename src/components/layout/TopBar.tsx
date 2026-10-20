@@ -14,7 +14,7 @@ function ClientsBar() {
   return (
     <header className="flex h-[60px] items-center justify-between border-b border-[var(--line)] bg-[var(--sidebar)] px-4 xl:hidden md:h-16">
       <div className="flex min-w-0 items-center gap-3">
-        <img src="/logo.png" alt="" className="size-8 rounded-full object-cover md:size-9" />
+        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="" className="size-8 rounded-full object-cover md:size-9" />
         <span className="truncate font-display text-[15px]">Rabisco Ink</span>
         <Link
           to="/clientes"
@@ -36,7 +36,7 @@ function FileBar() {
   return (
     <header className="flex h-14 items-center border-b border-[var(--line)] bg-[var(--sidebar)] px-4 xl:hidden md:h-16">
       <div className="flex min-w-0 items-center gap-3">
-        <img src="/logo.png" alt="" className="hidden size-9 rounded-full object-cover md:block" />
+        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="" className="hidden size-9 rounded-full object-cover md:block" />
         <span className="hidden font-display text-[15px] md:inline">Rabisco Ink</span>
         <Link
           to="/clientes"

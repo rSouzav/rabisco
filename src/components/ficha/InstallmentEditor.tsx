@@ -2,6 +2,7 @@ import { PayBox, payState } from '@/components/ficha/PayBox'
 import { formatShortDate } from '@/lib/dates'
 import type { DraftInstallment } from '@/lib/draft'
 import { cn } from '@/lib/cn'
+import { commitMask, type MaskKind } from '@/lib/mask'
 import { formatMoney, parseMoney } from '@/lib/money'
 
 type InstallmentEditorProps = {
@@ -87,6 +88,7 @@ function InstallmentTable({ items, today, onToggle, onPaidChange, onPaidBlur, on
                     value={item.paidOnText}
                     label={`Data de pagamento da parcela ${number}`}
                     placeholder="dd/mm/aaaa"
+                    mask="date"
                     onChange={(value) => onDateChange(item.number, value)}
                   />
                 </td>
@@ -136,6 +138,7 @@ function InstallmentCards({ items, today, onToggle, onPaidChange, onPaidBlur, on
               label="Pago em"
               value={item.paidOnText}
               placeholder="dd/mm/aaaa"
+              mask="date"
               onChange={(value) => onDateChange(item.number, value)}
             />
           </article>
@@ -150,6 +153,7 @@ function CellInput({
   label,
   placeholder,
   muted = false,
+  mask,
   onChange,
   onBlur,
 }: {
@@ -157,6 +161,7 @@ function CellInput({
   label: string
   placeholder?: string
   muted?: boolean
+  mask?: MaskKind
   onChange: (value: string) => void
   onBlur?: () => void
 }) {
@@ -165,7 +170,8 @@ function CellInput({
       value={value}
       aria-label={label}
       placeholder={placeholder}
-      onChange={(event) => onChange(event.target.value)}
+      inputMode={mask === 'date' ? 'numeric' : mask === 'phone' ? 'tel' : undefined}
+      onChange={(event) => onChange(mask ? commitMask(event.currentTarget, mask) : event.target.value)}
       onBlur={onBlur}
       className={cn(
         'h-9 w-full border border-[var(--line)] bg-[var(--surface)] px-2.5 text-[13px] outline-none placeholder:text-[var(--muted)] focus:border-[var(--bone)]',
@@ -180,6 +186,7 @@ function InlineField({
   value,
   placeholder,
   muted = false,
+  mask,
   onChange,
   onBlur,
 }: {
@@ -187,6 +194,7 @@ function InlineField({
   value: string
   placeholder?: string
   muted?: boolean
+  mask?: MaskKind
   onChange: (value: string) => void
   onBlur?: () => void
 }) {
@@ -197,7 +205,8 @@ function InlineField({
         value={value}
         placeholder={placeholder}
         aria-label={label}
-        onChange={(event) => onChange(event.target.value)}
+        inputMode={mask === 'date' ? 'numeric' : mask === 'phone' ? 'tel' : undefined}
+        onChange={(event) => onChange(mask ? commitMask(event.currentTarget, mask) : event.target.value)}
         onBlur={onBlur}
         className={cn(
           'w-[46%] bg-transparent text-right text-[16px] outline-none placeholder:text-[var(--muted)]',

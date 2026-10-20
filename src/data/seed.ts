@@ -67,7 +67,7 @@ export const seedClients: Client[] = [
       title: 'Dragão no antebraço',
       description: 'Dragão blackwork no antebraço direito, do pulso ao cotovelo. Linha grossa, sem cor.',
       bodyLocation: 'Antebraço direito',
-      imageUrl: '/marina.jpg',
+      imageUrl: `${import.meta.env.BASE_URL}marina.jpg`,
     },
     totalCents: 180_000,
     startDate: '2026-06-15',

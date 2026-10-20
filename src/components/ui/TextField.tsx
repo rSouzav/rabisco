@@ -1,4 +1,5 @@
 import { cn } from '@/lib/cn'
+import { commitMask, type MaskKind } from '@/lib/mask'
 import { useId, type ReactNode } from 'react'
 
 type TextFieldProps = {
@@ -10,6 +11,7 @@ type TextFieldProps = {
   autoComplete?: string
   placeholder?: string
   inputMode?: 'text' | 'decimal' | 'numeric' | 'email' | 'tel'
+  mask?: MaskKind
   multiline?: boolean
   trailing?: ReactNode
   className?: string
@@ -26,6 +28,7 @@ export function TextField({
   autoComplete,
   placeholder,
   inputMode,
+  mask,
   multiline = false,
   trailing,
   className,
@@ -66,8 +69,8 @@ export function TextField({
               value={value}
               autoComplete={autoComplete}
               placeholder={placeholder}
-              inputMode={inputMode}
-              onChange={(event) => onChange(event.target.value)}
+              inputMode={inputMode ?? (mask === 'phone' ? 'tel' : mask === 'date' ? 'numeric' : undefined)}
+              onChange={(event) => onChange(mask ? commitMask(event.currentTarget, mask) : event.target.value)}
               onBlur={onBlur}
               className={cn(
                 'min-w-0 flex-1 bg-transparent text-[16px] text-[var(--bone)] outline-none placeholder:text-[var(--muted)] md:text-[14px]',

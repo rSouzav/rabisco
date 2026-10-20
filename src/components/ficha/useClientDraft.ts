@@ -1,5 +1,6 @@
 import { applySchedule, clientToDraft, emptyDraft, viewDraft, type ClientDraft, type DraftInstallment } from '@/lib/draft'
 import { formatSlashDate, todayISO } from '@/lib/dates'
+import { maskPhoneFinal } from '@/lib/mask'
 import { formatMoney, parseMoney } from '@/lib/money'
 import type { Client } from '@/types/client'
 import { useMemo, useState } from 'react'
@@ -29,6 +30,10 @@ export function useClientDraft(client: Client | null) {
       ...current,
       Installments: current.Installments.map((item) => (item.number === number ? { ...item, ...patch } : item)),
     }))
+  }
+
+  function blurPhone() {
+    setDraft((current) => ({ ...current, phone: maskPhoneFinal(current.phone) }))
   }
 
   function blurSchedule(source: 'total' | 'times' | 'monthly' | 'start') {
@@ -76,6 +81,7 @@ export function useClientDraft(client: Client | null) {
     saved,
     today,
     update,
+    blurPhone,
     updateInstallment,
     blurSchedule,
     blurPaid,

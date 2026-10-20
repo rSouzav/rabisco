@@ -49,7 +49,7 @@ export function LoginPage() {
       <div className="flex min-h-full flex-col md:flex-row">
         <section className="flex flex-col items-center justify-center gap-7 px-6 pb-2 pt-10 md:w-[320px] md:shrink-0 md:gap-8 md:bg-[var(--brand)] md:px-8 xl:w-[540px]">
           <img
-            src="/logo.png"
+            src={`${import.meta.env.BASE_URL}logo.png`}
             alt="Rabisco Ink"
             className="size-[168px] rounded-full object-cover md:size-[210px] xl:size-[300px]"
           />

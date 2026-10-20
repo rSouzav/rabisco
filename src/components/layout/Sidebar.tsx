@@ -9,7 +9,7 @@ export function Sidebar() {
     <aside className="hidden h-full w-[232px] shrink-0 flex-col justify-between border-r border-[var(--line)] bg-[var(--sidebar)] px-5 py-7 xl:flex">
       <div className="flex flex-col gap-7">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="" className="size-11 rounded-full object-cover" />
+          <img src={`${import.meta.env.BASE_URL}logo.png`} alt="" className="size-11 rounded-full object-cover" />
           <div className="flex flex-col gap-0.5">
             <span className="font-display text-[15px] leading-none">Rabisco Ink</span>
             <span className="text-[11px] text-[var(--muted)]">Since 2015</span>
