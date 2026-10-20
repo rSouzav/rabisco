@@ -1,6 +1,6 @@
 export type MaskKind = 'phone' | 'date'
 
-function phoneDigits(value: string) {
+export function phoneDigits(value: string) {
   let digits = value.replace(/\D/g, '')
   if (digits.length > 11 && digits.startsWith('55')) digits = digits.slice(2)
   return digits.slice(0, 11)

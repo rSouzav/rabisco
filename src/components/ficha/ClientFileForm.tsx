@@ -225,6 +225,8 @@ export function ClientFileForm({ client, onSave, onCancel, onDelete }: ClientFil
         <InstallmentEditor
           items={draft.Installments}
           today={today}
+          clientName={draft.name}
+          phone={draft.phone}
           onToggle={draftState.togglePaid}
           onPaidChange={(number, value) => draftState.updateInstallment(number, { paidText: value })}
           onPaidBlur={draftState.blurPaid}

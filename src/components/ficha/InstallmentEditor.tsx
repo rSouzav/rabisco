@@ -4,10 +4,14 @@ import type { DraftInstallment } from '@/lib/draft'
 import { cn } from '@/lib/cn'
 import { commitMask, type MaskKind } from '@/lib/mask'
 import { formatMoney, parseMoney } from '@/lib/money'
+import { overdueReminder, whatsappLink } from '@/lib/whatsapp'
+import { MessageCircle } from 'lucide-react'
 
 type InstallmentEditorProps = {
   items: DraftInstallment[]
   today: string
+  clientName: string
+  phone: string
   onToggle: (number: number) => void
   onPaidChange: (number: number, value: string) => void
   onPaidBlur: (number: number) => void
@@ -23,10 +27,19 @@ export function InstallmentEditor(props: InstallmentEditorProps) {
   )
 }
 
-function InstallmentTable({ items, today, onToggle, onPaidChange, onPaidBlur, onDateChange }: InstallmentEditorProps) {
+function InstallmentTable({
+  items,
+  today,
+  clientName,
+  phone,
+  onToggle,
+  onPaidChange,
+  onPaidBlur,
+  onDateChange,
+}: InstallmentEditorProps) {
   return (
     <div className="hidden overflow-x-auto md:block">
-      <table className="w-full min-w-[860px] border-collapse text-left">
+      <table className="w-full min-w-[980px] border-collapse text-left">
         <thead>
           <tr className="h-9 border-b border-[var(--line)] text-[11px] font-semibold tracking-[0.6px] text-[var(--muted)]">
             <th scope="col" className="w-16 px-2.5 font-semibold">
@@ -50,6 +63,9 @@ function InstallmentTable({ items, today, onToggle, onPaidChange, onPaidBlur, on
             <th scope="col" className="px-2.5 font-semibold">
               SITUAÇÃO
             </th>
+            <th scope="col" className="w-[120px] px-2.5 font-semibold">
+              COBRAR
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -59,6 +75,7 @@ function InstallmentTable({ items, today, onToggle, onPaidChange, onPaidBlur, on
             const overdue = item.dueDate < today && state !== 'paid'
             const situation = situationCopy(paidCents, item.expectedCents, overdue, 'table')
             const number = String(item.number).padStart(2, '0')
+            const reminderHref = overdue ? reminderLink(clientName, phone, item, number, paidCents) : null
 
             return (
               <tr key={item.id} className="h-[58px] border-b border-[var(--line)]">
@@ -93,6 +110,9 @@ function InstallmentTable({ items, today, onToggle, onPaidChange, onPaidBlur, on
                   />
                 </td>
                 <td className={cn('px-2.5 text-[13px]', situation.className)}>{situation.label}</td>
+                <td className="px-2.5">
+                  {reminderHref && <WhatsAppReminder href={reminderHref} number={number} className="h-9 px-3" />}
+                </td>
               </tr>
             )
           })}
@@ -102,7 +122,16 @@ function InstallmentTable({ items, today, onToggle, onPaidChange, onPaidBlur, on
   )
 }
 
-function InstallmentCards({ items, today, onToggle, onPaidChange, onPaidBlur, onDateChange }: InstallmentEditorProps) {
+function InstallmentCards({
+  items,
+  today,
+  clientName,
+  phone,
+  onToggle,
+  onPaidChange,
+  onPaidBlur,
+  onDateChange,
+}: InstallmentEditorProps) {
   return (
     <div className="md:hidden">
       {items.map((item) => {
@@ -111,6 +140,7 @@ function InstallmentCards({ items, today, onToggle, onPaidChange, onPaidBlur, on
         const overdue = item.dueDate < today && state !== 'paid'
         const situation = situationCopy(paidCents, item.expectedCents, overdue, 'card')
         const number = String(item.number).padStart(2, '0')
+        const reminderHref = overdue ? reminderLink(clientName, phone, item, number, paidCents) : null
 
         return (
           <article key={item.id} className="flex flex-col gap-2 border-b border-[var(--line)] py-3">
@@ -141,10 +171,49 @@ function InstallmentCards({ items, today, onToggle, onPaidChange, onPaidBlur, on
               mask="date"
               onChange={(value) => onDateChange(item.number, value)}
             />
+            {reminderHref && (
+              <WhatsAppReminder href={reminderHref} number={number} className="h-11 w-full text-[14px]" />
+            )}
           </article>
         )
       })}
     </div>
+  )
+}
+
+function reminderLink(
+  clientName: string,
+  phone: string,
+  item: DraftInstallment,
+  number: string,
+  paidCents: number,
+) {
+  return whatsappLink(
+    phone,
+    overdueReminder({
+      name: clientName,
+      number,
+      dueDate: item.dueDate,
+      missingCents: item.expectedCents - paidCents,
+    }),
+  )
+}
+
+function WhatsAppReminder({ href, number, className }: { href: string; number: string; className?: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Cobrar parcela ${number} pelo WhatsApp`}
+      className={cn(
+        'inline-flex items-center justify-center gap-1.5 bg-[var(--whatsapp)] text-[13px] font-semibold text-[var(--ink)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[var(--bone)]',
+        className,
+      )}
+    >
+      <MessageCircle className="size-4" strokeWidth={2} aria-hidden="true" />
+      WhatsApp
+    </a>
   )
 }
 
